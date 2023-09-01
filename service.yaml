@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-app-service
+spec:
+  type: NodePort
+  selector:
+    env: prd-env
+  Ports:
+  - name: HTTP
+    port: 80
+    torgetPort: 8080
+    protocol: TCP

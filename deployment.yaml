@@ -1,0 +1,21 @@
+apiversion: app/v1
+kind: deployment
+metadata: 
+  name: spring-app
+  labels: 
+    env: prd-env
+spec:
+ replicas: 3
+ selector:
+   matchLabels: 
+    env: prd-env
+ template:
+    metadata:
+      labels: 
+        env: prd-env
+    spec:
+      conatiners:
+      - name: spring-prd-app
+        image: 
+        ports:
+        - containerPort: 8080
