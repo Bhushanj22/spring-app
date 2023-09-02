@@ -8,13 +8,13 @@ pipeline{
 
     stages{
      stage('checkout'){
-        step{
+        steps{
            git branch : 'main', url:'https://github.com/Bhushanj22/spring-app'
            sh 'echo passed'
            }
         }
      stage('Build and test'){
-        step{
+        steps{
         sh ' mvn clean package'
         }
     }
@@ -22,7 +22,7 @@ pipeline{
         environment{
             SONAR_URL = "http://20.204.55.55:9000"
         }
-        step{
+        steps{
             withcredentials([string(credentialSId: 'sonarID', variable:'SonarID')])
             sh 'mvn sonar:sonar -Dsonar.login:"SONAR_AUTH_TOKEN" -Dsonar.host.url:${SONAR_URL}'
         }
@@ -33,7 +33,7 @@ pipeline{
                 DOCKER_IMAGE : "bjadhav22/spring-app:${Build_NUMBER}"
                 // DOCKER_FILE_LOCATION: "
             }
-        step{
+        steps{
             sh 'docker build -t ${DOCKER_IMAGE}'
             def dockerImage = docker.image("${DOCKER_IMAGE}")
             docker.withRegistry('https:https://hub.docker.com/', "DockerPass"){
