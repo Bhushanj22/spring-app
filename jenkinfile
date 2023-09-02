@@ -31,7 +31,7 @@ pipeline{
     stage("Build and Push Image"){
         environment{
                 REGISTRY_CREDENTIAL : credentials('DockerPass')
-                DOCKER_IMAGE :  bjadha/spring-app:$(Build_NUMBER)
+                DOCKER_IMAGE : "bjadhav22/spring-app:${Build_NUMBER}"
                 // DOCKER_FILE_LOCATION: "
             }
         step{
