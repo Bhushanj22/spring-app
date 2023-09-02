@@ -41,7 +41,6 @@ pipeline{
        }
        }
 
-    }
     stage('Update Deployment File') {
         environment {
             GIT_REPO_NAME = "https://github.com/Bhushanj22/spring-app"
