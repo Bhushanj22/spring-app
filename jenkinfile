@@ -1,6 +1,20 @@
 pipeline{
     agent any
     stages{
+    stage('pre-build stage'){
+        steps{
+           sh 'sudo apt update && sudo apt install -y maven'
+           sh '''
+                    sudo apt update
+                    sudo apt install -y docker.io
+                    sudo systemctl start docker
+                    sudo systemctl enable docker
+                    
+                    # Add the Jenkins user to the Docker group to run Docker without sudo
+                    sudo usermod -aG docker jenkins
+               '''
+        }
+}
      stage('checkout'){
         steps{
            git branch : 'main', url:'https://github.com/Bhushanj22/spring-app'
