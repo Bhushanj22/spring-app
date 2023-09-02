@@ -9,7 +9,7 @@ pipeline{
     stages{
         stage('checkout'){
         step{
-           git branch : 'main' url: 'https://github.com/Bhushanj22/spring-app'
+           git branch : 'main' url:'https://github.com/Bhushanj22/spring-app'
            sh 'echo passed'
            }
         }
