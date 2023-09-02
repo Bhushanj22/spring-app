@@ -27,8 +27,7 @@ pipeline{
             sh 'mvn sonar:sonar -Dsonar.login:"SONAR_AUTH_TOKEN" -Dsonar.host.url:${SONAR_URL}'
         }
       }
-    stage("Build and Push Image"){
-        stage("Build and Push Image") {
+     stage("Build and Push Image") {
         environment {
             REGISTRY_CREDENTIAL = credentials('DockerPass')
             DOCKER_IMAGE = "bjadhav22/spring-app:${BUILD_NUMBER}"
