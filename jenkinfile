@@ -1,25 +1,24 @@
 pipeline{
     agent{
-        docker{
+        docker {
             image 'abhishekf5/maven-abhishek-docker-agent:v1'
             argv '--user root -v /var/run/docker.sock:/var/run/docker.sock.'
         }
     }
 
     stages{
-        stage('checkout'){
+     stage('checkout'){
         step{
            git branch : 'main', url:'https://github.com/Bhushanj22/spring-app'
            sh 'echo passed'
            }
         }
-    }
-    stage('Build and test'){
+     stage('Build and test'){
         step{
         sh ' mvn clean package'
         }
     }
-    stage('static code analysie'){
+     stage('static code analysie'){
         environment{
             SONAR_URL = "http://20.204.55.55:9000"
         }
