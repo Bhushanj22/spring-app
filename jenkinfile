@@ -35,7 +35,7 @@ pipeline{
                 // DOCKER_FILE_LOCATION: "
             }
         step{
-            sh 'docker build -t ${DOCKER_IMAGE}
+            sh 'docker build -t ${DOCKER_IMAGE}'
             def dockerImage : docker.image("${DOCKER_IMAGE}")
             docker.withRegistry('https:https://hub.docker.com/', "DockerPass"){
                 dockerImage.push()
