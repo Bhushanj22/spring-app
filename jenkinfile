@@ -18,7 +18,7 @@ pipeline{
         sh ' mvn clean package'
         }
     }
-     stage('static code analysie'){
+    stage('static code analysie'){
         environment{
             SONAR_URL = "http://20.204.55.55:9000"
         }
@@ -26,7 +26,7 @@ pipeline{
             withcredentials([string(credentialSId: 'sonarID', variable:'SONAR_AUTH_TOKEN')])
             sh 'mvn sonar:sonar -Dsonar.login:"SONAR_AUTH_TOKEN" -Dsonar.host.url:${SONAR_URL}'
         }
-    }
+      }
     stage ("Build and Push Image") {
         stage("Build and Push Image") {
         environment {
@@ -38,9 +38,9 @@ pipeline{
             def dockerImage = docker.image("${DOCKER_IMAGE}")
             docker.withRegistry('https://hub.docker.com/', "DockerPass") {
                 dockerImage.push()
-            }
-        }
-}
+                }
+       }
+       }
 
     }
     stage('Update Deployment File') {
