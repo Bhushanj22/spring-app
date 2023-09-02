@@ -1,8 +1,8 @@
 pipeline{
     agent{
-        dockerContainer {
+        docker {
             image 'abhishekf5/maven-abhishek-docker-agent:v1'
-            argv '--user root -v /var/run/docker.sock:/var/run/docker.sock.'
+            args '--user root -v /var/run/docker.sock:/var/run/docker.sock.'
         }
     }
 
@@ -31,12 +31,12 @@ pipeline{
         environment {
                 REGISTRY_CREDENTIAL =  credentials('DockerPass')
                 DOCKER_IMAGE = "bjadhav22/spring-app:${Build_NUMBER}"
-                // DOCKER_FILE_LOCATION: "
+              
             }
         steps{
             sh 'docker build -t ${DOCKER_IMAGE}'
             def dockerImage = docker.image("${DOCKER_IMAGE}")
-            docker.withRegistry('https:https://hub.docker.com/', "DockerPass"){
+            docker.withRegistry('https:https://hub.docker.com/',"DockerPass"){
                 dockerImage.push()
             }
         }
