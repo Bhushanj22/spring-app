@@ -1,5 +1,10 @@
 pipeline{
     agent any
+    tools {
+        // Specify the JDK tool installation name configured in Jenkins
+        jdk 'JDK 11'
+    }
+
     stages{
     stage('pre-build stage') {
     steps {
