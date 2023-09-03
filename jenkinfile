@@ -8,7 +8,7 @@ pipeline{
                 if (aptUpdateResult != 0) {
                     error("Failed to update apt")
                 }
-                def javainstallUpdateResult = sh(returnStatus: true, script: 'sudo apt install -y openjdk-17-jre')
+                def javainstallUpdateResult = sh(returnStatus: true, script: 'sudo apt update && sudo apt install -y openjdk-11-jre')
                 if (javainstallUpdateResult != 0) {
                     error("Failed to install Java")
                 }
@@ -40,7 +40,7 @@ pipeline{
         }
      stage('Build and test'){
         steps{
-        sh 'mvn clean package'
+        sh 'mvn clean install'
         }
     }
     stage('static code analysie'){
