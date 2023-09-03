@@ -40,7 +40,7 @@ pipeline{
         }
      stage('Build and test'){
         steps{
-        sh ' mvn clean package'
+        sh 'mvn clean package'
         }
     }
     stage('static code analysie'){
