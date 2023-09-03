@@ -1,37 +1,36 @@
 pipeline{
     agent any
-    tools {
-        // Specify the JDK tool installation name configured in Jenkins
+   tools {
+        // Use OpenJDK 11 tool installation name (configure it in Jenkins)
         jdk 'JDK 8'
     }
-
-    stages{
-    stage('pre-build stage') {
-    steps {
-        script {
-            def aptUpdateResult = sh(returnStatus: true, script: 'sudo apt update')
-            if (aptUpdateResult != 0) {
-                error("Failed to update apt")
-            }
-
-            def mavenInstallResult = sh(returnStatus: true, script: 'sudo apt install -y maven')
-            if (mavenInstallResult != 0) {
-                error("Failed to install Maven")
-            }
-
-            def dockerInstallResult = sh(returnStatus: true, script: '''
-                sudo apt update
-                sudo apt install -y docker.io
-                sudo systemctl start docker
-                sudo systemctl enable docker
-                sudo usermod -aG docker jenkins
-            ''')
-            if (dockerInstallResult != 0) {
-                error("Failed to install Docker")
+    stages {
+        stage('pre-build stage') {
+        steps {
+            script {
+                def aptUpdateResult = sh(returnStatus: true, script: 'sudo apt update')
+                if (aptUpdateResult != 0) {
+                    error("Failed to update apt")
+                }
+    
+                def mavenInstallResult = sh(returnStatus: true, script: 'sudo apt install -y maven')
+                if (mavenInstallResult != 0) {
+                    error("Failed to install Maven")
+                }
+    
+                def dockerInstallResult = sh(returnStatus: true, script: '''
+                    sudo apt update
+                    sudo apt install -y docker.io
+                    sudo systemctl start docker
+                    sudo systemctl enable docker
+                    sudo usermod -aG docker jenkins
+                ''')
+                if (dockerInstallResult != 0) {
+                    error("Failed to install Docker")
+                }
             }
         }
     }
-}
 
      stage('checkout'){
         steps{
