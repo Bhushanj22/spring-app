@@ -1,20 +1,33 @@
 pipeline{
     agent any
     stages{
-    stage('pre-build stage'){
-        steps{
-           sh 'sudo apt update && sudo apt install -y maven'
-           sh '''
-                    sudo apt update
-                    sudo apt install -y docker.io
-                    sudo systemctl start docker
-                    sudo systemctl enable docker
-                    
-                    # Add the Jenkins user to the Docker group to run Docker without sudo
-                    sudo usermod -aG docker jenkins
-               '''
+    stage('pre-build stage') {
+    steps {
+        script {
+            def aptUpdateResult = sh(returnStatus: true, script: 'sudo apt update')
+            if (aptUpdateResult != 0) {
+                error("Failed to update apt")
+            }
+
+            def mavenInstallResult = sh(returnStatus: true, script: 'sudo apt install -y maven')
+            if (mavenInstallResult != 0) {
+                error("Failed to install Maven")
+            }
+
+            def dockerInstallResult = sh(returnStatus: true, script: '''
+                sudo apt update
+                sudo apt install -y docker.io
+                sudo systemctl start docker
+                sudo systemctl enable docker
+                sudo usermod -aG docker jenkins
+            ''')
+            if (dockerInstallResult != 0) {
+                error("Failed to install Docker")
+            }
         }
+    }
 }
+
      stage('checkout'){
         steps{
            git branch : 'main', url:'https://github.com/Bhushanj22/spring-app'
