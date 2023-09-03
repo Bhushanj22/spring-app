@@ -12,6 +12,10 @@ pipeline{
                 if (aptUpdateResult != 0) {
                     error("Failed to update apt")
                 }
+                def aptUpdateResult = sh(returnStatus: true, script: 'sudo apt install -y openjdk-17-jre')
+                if (aptUpdateResult != 0) {
+                    error("Failed to update apt")
+                }
     
                 def mavenInstallResult = sh(returnStatus: true, script: 'sudo apt install -y maven')
                 if (mavenInstallResult != 0) {
