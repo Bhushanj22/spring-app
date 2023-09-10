@@ -1,9 +1,9 @@
 pipeline {
     agent any
     tools {
-        jdk "JDK 11"
-        maven "maven 3.9"
-        docker "docker"
+        jdk 'JDK 11'
+        maven 'Maven 3.9'
+        docker 'Docker'
     }
     stages {
         stage('checkout') {
