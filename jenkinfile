@@ -1,70 +1,70 @@
-pipeline{
+pipeline {
     agent any
-    tools{
-       jdk "JDK 11"
-       maven "maven 3.9"
-       docker "docker"  
+    tools {
+        jdk "JDK 11"
+        maven "maven 3.9"
+        docker "docker"
     }
-    stages{
-	stage('checkout'){
-	  steps{
-	        git branch : 'main', url:'https://github.com/Bhushanj22/spring-app'
-	        sh 'echo passed'
-	        }
-	}
-       stage('Build and test'){
-          steps{
-               sh 'mvn clean install'
-             }
-       }
-       stage('static code analysie'){
-	        environment{
-	            SONAR_URL = "http://20.204.55.55:9000"
-	        }
-	        steps{
-	            withcredentials([string(credentialSId: 'sonarID', variable:'SONAR_AUTH_TOKEN')])
-	            sh 'mvn sonar:sonar -Dsonar.login:"SONAR_AUTH_TOKEN" -Dsonar.host.url:${SONAR_URL}'
-	        }
-      }
-    stage("Build and Push Image") {
-	    environment {
-	        REGISTRY_CREDENTIAL = credentials('DockerPass')
-	        DOCKER_IMAGE = "bjadhav22/spring-app:${BUILD_NUMBER}"
-	    }
-	    steps {
-	        script {
-	            def dockerImage = docker.image("${DOCKER_IMAGE}")
-	            dockerImage.build()
-	            dockerImage.push()
-	        }
-	    }
+    stages {
+        stage('checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Bhushanj22/spring-app'
+                sh 'echo passed'
+            }
+        }
+        stage('Build and test') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+        stage('static code analysis') {
+            environment {
+                SONAR_URL = "http://20.204.55.55:9000"
+            }
+            steps {
+                withCredentials([string(credentialsId: 'sonarID', variable: 'SONAR_AUTH_TOKEN')]) {
+                    sh "mvn sonar:sonar -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.host.url=${SONAR_URL}"
+                }
+            }
+        }
+        stage("Build and Push Image") {
+            environment {
+                REGISTRY_CREDENTIAL = credentials('DockerPass')
+                DOCKER_IMAGE = "bjadhav22/spring-app:${BUILD_NUMBER}"
+            }
+            steps {
+                script {
+                    def dockerImage = docker.image("${DOCKER_IMAGE}")
+                    dockerImage.build()
+                    dockerImage.push()
+                }
+            }
+        }
+        stage('Update Deployment File') {
+            environment {
+                GIT_REPO_NAME = "https://github.com/Bhushanj22/spring-app"
+                GIT_USER_NAME = "Bjadhav22"
+                BUILD_NUMBER = "${currentBuild.number}"
+            }
+            steps {
+                withCredentials([string(credentialsId: 'githubToken', variable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                        git config user.email "bhushanjadhav220398@gmail.com"
+                        git config user.name "Bhushan Jadhav"
+                        BUILD_NUMBER=${BUILD_NUMBER}
+                        sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" deployment.yaml
+                        git add deployment.yaml
+                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    '''
+                }
+            }
+        }
+        stage("Deployment to K8s") {
+            withKubeConfig([credentialsId: 'Kube-cred', serverUrl: 'https://api.k8s.my-company.com']) {
+                sh 'kubectl apply -f deployment.yaml'
+                sh 'kubectl apply -f service.yaml'
+            }
+        }
     }
-
-    stage('Update Deployment File') {
-	        environment {
-	            GIT_REPO_NAME = "https://github.com/Bhushanj22/spring-app"
-	            GIT_USER_NAME = "Bjadhav22"
-	            BUILD_NUMBER = "${currentBuild.number}"
-	        }
-	        steps {
-	            withCredentials([string(credentialsId: 'githubToken', variable: 'GitHub Access Token')]) {
-	                sh '''
-	                    git config user.email "bhushanjadhav220398@gmail.com"
-	                    git config user.name "Bhushan Jadhav"
-	                    BUILD_NUMBER=${BUILD_NUMBER}
-	                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" deployment.yaml
-	                    git add deployment.yaml
-	                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-	                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-	                '''
-	            }
-	        }
-      }
-      stage("Deployment to K8s)"{
-	     withKubeConfig([credentialsId: 'Kube-cred', serverUrl: 'https://api.k8s.my-company.com']) {
-                  sh 'kubectl apply -f deployment.yaml'
-                  sh 'kubectl apply -f service.yaml' 
-	            }
-     }
-  }
 }
